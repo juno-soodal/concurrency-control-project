@@ -26,6 +26,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: 테스트 실행
-        run: ./gradlew test
+        run: |
+          echo "$APPLICATION_YML" > src/main/resources/application.yml
+          ./gradlew test
         env:
           SPRING_PROFILES_ACTIVE: test
