@@ -46,6 +46,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Upload Test
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: app/build/reports/tests/testDebugUnitTest/index.html
+          
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
 
@@ -55,3 +62,4 @@ jobs:
           ./gradlew test
         env:
           SPRING_PROFILES_ACTIVE: test
+
