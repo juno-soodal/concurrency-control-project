@@ -46,20 +46,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Upload Test
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: report_files
-          path: report_files_*.tar.gz
-
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
 
       - name: 테스트 실행
         run: |
-          echo "$APPLICATION_YML" > src/main/resources/application.yml
-          ./gradlew test
+          #          echo "$APPLICATION_YML" > src/main/resources/application.yml
+               ./gradlew test
         env:
           SPRING_PROFILES_ACTIVE: test
 
