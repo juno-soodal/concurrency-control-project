@@ -48,11 +48,11 @@ jobs:
 
       - name: Upload Test
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: app/build/reports/tests/testDebugUnitTest/index.html
-          
+
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
 
