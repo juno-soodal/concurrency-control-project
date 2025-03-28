@@ -1,4 +1,4 @@
-name: CI
+name: pr check
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
       - dev
 
 jobs:
-  build:
+  pr-check:
     runs-on: ubuntu-latest
 
     services:

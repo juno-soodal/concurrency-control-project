@@ -1,10 +1,11 @@
 name: CD
-
 on:
   workflow_run:
-    workflows: [ "CI" ]
-    types: [ completed ]
-    branches: [ main ]
+    workflows: ["pr check"]
+    types:
+      - completed
+    branches:
+      - main
 env:
   ECR_REPOSITORY: team-9-server-ecr
   IMAGE_TAG: latest
