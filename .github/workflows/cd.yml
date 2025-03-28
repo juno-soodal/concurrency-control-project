@@ -30,12 +30,10 @@ jobs:
           echo "$APPLICATION_YML" > src/main/resources/application.yml
           echo "$APPLICATION_PROD" > src/main/resources/application_PROD.yml
           echo "$APPLICATION_JWT" > src/main/resources/application-jwt.yml
-          echo "$APPLICATION_TEST" > src/test/resources/application-test.yml
         env:
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
           APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
           APPLICATION_JWT: ${{ secrets.APPLICATION_JWT }}
-          APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
