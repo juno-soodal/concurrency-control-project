@@ -1,45 +1,16 @@
 name: CI
+
 on:
   push:
     branches:
       - dev
-      - main
   pull_request:
     branches:
       - dev
 
-env:
-  ECR_REPOSITORY: team-9-server-ecr
-  IMAGE_TAG: latest
-  EC2_SERVER: team9-server
-
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
-
-    services:
-      my-db:
-        image: mysql
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-    
 
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
@@ -51,68 +22,41 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: gradlew 실행 권한 부여
-        run: chmod +x gradlew
-
-      - name: 테스트 실행
+      - name: yml 파일 만들기
         run: |
           mkdir -p src/main/resources/
           mkdir -p src/test/resources/
           echo "$APPLICATION_YML" > src/main/resources/application.yml
           echo "$APPLICATION_JWT" > src/main/resources/application-jwt.yml
           echo "$APPLICATION_TEST" > src/test/resources/application-test.yml
-          ./gradlew test
         env:
-          SPRING_PROFILES_ACTIVE: test
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
           APPLICATION_JWT: ${{ secrets.APPLICATION_JWT }}
           APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
-  cd:
-    runs-on: ubuntu-latest
-    needs: ci
-    if: github.ref == 'refs/heads/main' && success()
-    steps:
-      - name: prod-yml 파일 만들기
+      - name: Docker Compose 실행
+        run: docker compose up -d
+
+      - name: MySQL 서비스 헬시 상태 대기
         run: |
-          mkdir -p src/main/resources/
-          echo "$APPLICATION_PROD" > src/main/resources/application_prod.yml
-        env:
-          APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
+          echo "⏳ Waiting for MySQL to be healthy..."
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' my-db)" == "healthy" ]; do
+            sleep 2;
+          done
+          echo "✅ MySQL is healthy!"
 
-      - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
-
-      - name: aws iam 사용자 설정
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: ecr에 로그인
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Docker 이미지 생성
+      - name: Redis 서비스 헬시 상태 대기
         run: |
-          docker build -t $ECR_REPOSITORY .
+          echo "⏳ Waiting for Redis to be healthy..."
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' redis-local)" == "healthy" ]; do
+            sleep 2;
+          done
+          echo "✅ Redis is healthy!"
 
-      - name: Docker 이미지에 Tag 붙이기
-        run: docker tag $ECR_REPOSITORY ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: gradlew 실행 권한 부여
+        run: chmod +x gradlew
 
-      - name: ECR에 Docker 이미지 Push
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: 테스트 실행
+        run: |
+          ./gradlew test
 
-      - name: SSH로 EC2에 접속
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            docker stop team9-server || true
-            docker rm team9-server || true
-            docker pull ${{ steps.login-ecr.outputs.registry }}/team-9-server-ecr:latest
-            docker run -d --name team9-server -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod ${{ steps.login-ecr.outputs.registry }}/team-9-server-ecr:latest
