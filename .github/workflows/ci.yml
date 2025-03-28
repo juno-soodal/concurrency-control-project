@@ -51,8 +51,13 @@ jobs:
 
       - name: 테스트 실행
         run: |
-          #          echo "$APPLICATION_YML" > src/main/resources/application.yml
-               ./gradlew test
+          echo "$APPLICATION_YML" > src/main/resources/application.yml
+          echo "$APPLICATION_JWT" > src/main/resources/config/jwt.yml
+          echo "$APPLICATION_TEST" > src/main/resources/application-test.yml
+          ./gradlew test
         env:
           SPRING_PROFILES_ACTIVE: test
+          APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
+          APPLICATION_JWT: ${{ secrets.APPLICATION_JWT }}
+          APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
