@@ -1,8 +1,9 @@
 name: CD
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 env:
   ECR_REPOSITORY: team-9-server-ecr
   IMAGE_TAG: latest
@@ -10,8 +11,8 @@ env:
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
         uses: actions/checkout@v4
