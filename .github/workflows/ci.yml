@@ -75,6 +75,7 @@ jobs:
     steps:
       - name: prod-yml 파일 만들기
         run: |
+          mkdir -p src/main/resources/
           echo "$APPLICATION_PROD" > src/main/resources/application_prod.yml
         env:
           APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
