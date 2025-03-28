@@ -12,29 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      my-db:
-        image: mysql
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
         uses: actions/checkout@v4
@@ -76,7 +53,7 @@ jobs:
             done
             echo "✅ $service is healthy!"
           done
-      
+
 
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
