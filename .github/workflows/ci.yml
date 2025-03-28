@@ -38,7 +38,7 @@ jobs:
           APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
       - name: Docker Compose 실행
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for MySQL & Redis to be healthy
         run: |
