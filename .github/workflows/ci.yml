@@ -51,6 +51,7 @@ jobs:
 
       - name: 테스트 실행
         run: |
+          mkdir -p src/main/resources/config
           echo "$APPLICATION_YML" > src/main/resources/application.yml
           echo "$APPLICATION_JWT" > src/main/resources/config/jwt.yml
           echo "$APPLICATION_TEST" > src/main/resources/application-test.yml
