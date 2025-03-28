@@ -2,6 +2,7 @@ package com.example.concurrencycontrolproject.domain.user.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.concurrencycontrolproject.domain.common.entity.TimeStamped;
 import com.example.concurrencycontrolproject.domain.user.enums.UserRole;
 
 import jakarta.annotation.Nullable;
@@ -17,7 +18,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "user")
+@Table(name = "users")
 public class User extends TimeStamped {
 
 	@Id

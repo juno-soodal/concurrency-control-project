@@ -19,6 +19,10 @@ import com.example.concurrencycontrolproject.domain.concert.entity.Concert;
 import com.example.concurrencycontrolproject.domain.concert.entity.ConcertStatus;
 
 @DataJpaTest
+// @SpringBootTest
+// @Transactional
+// @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// @ImportAutoConfiguration(exclude = RedisAutoConfiguration.class)
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
 class ConcertSearchRepositoryImplTest {
