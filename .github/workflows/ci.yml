@@ -1,4 +1,4 @@
-name: CI
+name: CIc
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           --health-timeout=5s
           --health-retries=3
     
-    
+
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
         uses: actions/checkout@v4
