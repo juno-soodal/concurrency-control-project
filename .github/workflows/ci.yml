@@ -36,9 +36,6 @@ jobs:
           APPLICATION_JWT: ${{ secrets.APPLICATION_JWT }}
           APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
-      - name: gradlew 실행 권한 부여
-        run: chmod +x gradlew
-
       - name: Docker Compose 실행
         run: docker compose up -d
 
@@ -49,7 +46,7 @@ jobs:
             sleep 2;
           done
           echo "✅ MySQL is healthy!"
-          
+
       - name: Redis 서비스 헬시 상태 대기
         run: |
           echo "⏳ Waiting for Redis to be healthy..."
@@ -57,6 +54,9 @@ jobs:
             sleep 2;
           done
           echo "✅ Redis is healthy!"
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x gradlew
 
       - name: 테스트 실행
         run: |
