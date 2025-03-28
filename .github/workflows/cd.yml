@@ -2,7 +2,7 @@ name: CD
 
 on:
   workflow_run:
-    workflows: [ "CI" ]
+    workflows: [ CI ]
     types:
       - completed
 
@@ -12,9 +12,9 @@ env:
   EC2_SERVER: team9-server
 
 jobs:
-  Deploy:
+  on-success:
     runs-on: ubuntu-latest
-
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: prod-yml 파일 만들기
         run: |
