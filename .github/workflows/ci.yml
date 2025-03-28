@@ -40,7 +40,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Docker Compose 실행
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: MySQL 서비스 헬시 상태 대기
         run: |
