@@ -4,15 +4,36 @@ on:
   push:
     branches:
       - dev
-      - main
   pull_request:
     branches:
       - dev
-      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      my-db:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
@@ -29,31 +50,33 @@ jobs:
           mkdir -p src/main/resources/
           mkdir -p src/test/resources/
           echo "$APPLICATION_YML" > src/main/resources/application.yml
+          echo "$APPLICATION_PROD" > src/main/resources/application_PROD.yml
           echo "$APPLICATION_JWT" > src/main/resources/application-jwt.yml
           echo "$APPLICATION_TEST" > src/test/resources/application-test.yml
+          ./gradlew test
         env:
+          SPRING_PROFILES_ACTIVE: test
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
+          APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
           APPLICATION_JWT: ${{ secrets.APPLICATION_JWT }}
           APPLICATION_TEST: ${{ secrets.APPLICATION_TEST }}
 
       - name: Docker Compose 실행
-        run: docker compose up -d
+        run: docker-compose up -d
 
-      - name: MySQL 서비스 헬시 상태 대기
+      - name: Wait for MySQL & Redis to be healthy
         run: |
-          echo "⏳ Waiting for MySQL to be healthy..."
-          until [ "$(docker inspect -f '{{.State.Health.Status}}' my-db)" == "healthy" ]; do
-            sleep 2;
+          echo "⏳ Waiting for containers to be healthy..."
+          docker compose ps
+          for service in mysql redis; do
+            echo "🔍 Waiting for $service"
+            until [ "$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q $service))" = "healthy" ]; do
+              echo "❗ $service is not healthy yet. Retrying..."
+              sleep 3
+            done
+            echo "✅ $service is healthy!"
           done
-          echo "✅ MySQL is healthy!"
-
-      - name: Redis 서비스 헬시 상태 대기
-        run: |
-          echo "⏳ Waiting for Redis to be healthy..."
-          until [ "$(docker inspect -f '{{.State.Health.Status}}' redis-local)" == "healthy" ]; do
-            sleep 2;
-          done
-          echo "✅ Redis is healthy!"
+      
 
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
