@@ -9,7 +9,7 @@ on:
       - dev
 
 jobs:
-  pr-check:
+  CI:
     runs-on: ubuntu-latest
 
     services:
