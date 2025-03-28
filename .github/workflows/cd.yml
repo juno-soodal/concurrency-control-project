@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  ECR_REPOSITORY: team9-server
+  ECR_REPOSITORY: team-9-server-ecr
   IMAGE_TAG: latest
 
 jobs:
