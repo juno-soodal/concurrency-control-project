@@ -39,21 +39,19 @@ jobs:
       - name: Docker Compose 실행
         run: docker compose up -d
 
-      - name: MySQL 서비스 헬시 상태 대기
+      - name: Wait for MySQL & Redis to be healthy
         run: |
-          echo "⏳ Waiting for MySQL to be healthy..."
-          until [ "$(docker inspect -f '{{.State.Health.Status}}' my-db)" == "healthy" ]; do
-            sleep 2;
+          echo "⏳ Waiting for containers to be healthy..."
+          docker compose ps
+          for service in mysql redis; do
+            echo "🔍 Waiting for $service"
+            until [ "$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q $service))" = "healthy" ]; do
+              echo "❗ $service is not healthy yet. Retrying..."
+              sleep 3
+            done
+            echo "✅ $service is healthy!"
           done
-          echo "✅ MySQL is healthy!"
-
-      - name: Redis 서비스 헬시 상태 대기
-        run: |
-          echo "⏳ Waiting for Redis to be healthy..."
-          until [ "$(docker inspect -f '{{.State.Health.Status}}' redis-local)" == "healthy" ]; do
-            sleep 2;
-          done
-          echo "✅ Redis is healthy!"
+      
 
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
