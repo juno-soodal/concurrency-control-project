@@ -6,7 +6,6 @@ on:
 env:
   ECR_REPOSITORY: team-9-server-ecr
   IMAGE_TAG: latest
-  EC2_SERVER: team9-server
 
 jobs:
   build:
@@ -49,16 +48,6 @@ jobs:
       - name: ecr에 로그인
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
-      - name: 기존 ECR에 업로드된 latest 태그 이미지 삭제
-        run: |
-          IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPOSITORY | jq '.imageDetails[].imageTags[0]')
-          if [[ -z "$IMAGE_DIGEST" ]]; then
-            echo "No images found in the repository."
-          else
-            aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageDigest=latest
-            echo "Deleted image with digest: $IMAGE_DIGEST"
-          fi 
 
       - name: Docker 이미지 생성
         run: |
