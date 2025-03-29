@@ -20,6 +20,6 @@ jobs:
           status: ${{ inputs.status }}
           fields: workflow,job,commit,message,ref,author,took
           text: |
-            ${{ inputs.status == 'success' && ':tada: 배포 성공!' || ':x: 배포 실패!' }}
+            ${{ inputs.status == 'success' && ':tada: PR 성공!' || ':x: PR 실패!' }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
