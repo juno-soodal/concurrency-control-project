@@ -52,18 +52,12 @@ jobs:
 
       - name: 기존 ECR에 업로드된 latest 태그 이미지 삭제
         run: |
-          IMAGE_DIGEST=$(aws ecr describe-images \
-            --repository-name $ECR_REPOSITORY \
-            --query "imageDetails[?contains(imageTags, \`$IMAGE_TAG\`)].imageDigest" \
-            --output text)
-
-          if [ -n "$IMAGE_DIGEST" ]; then
-            aws ecr batch-delete-image \
-              --repository-name $ECR_REPOSITORY \
-              --image-ids imageDigest=$IMAGE_DIGEST
-            echo "Deleted image with digest: $IMAGE_DIGEST"
+          IMAGE_TAG=$(aws ecr describe-images --repository-name $ECR_REPOSITORY | jq '.imageDetails[].imageTags[0]')
+          if [[ -z "$IMAGE_TAG" ]]; then
+            echo "No images found in the repository."
           else
-            echo "No image with tag '$IMAGE_TAG' found in ECR."
+            aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageTag=$IMAGE_TAG
+            echo "Deleted image with tag: $IMAGE_TAG"
           fi
 
       - name: Docker 이미지 생성
