@@ -3,9 +3,8 @@ name: CI
 on:
   pull_request:
     branches:
-      - test
-#      - dev
-#      - main
+      #      - dev
+      - main
 
 jobs:
   build:
@@ -58,3 +57,15 @@ jobs:
         run: |
           ./gradlew test
 
+        ## slack
+  action-slack:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Alarm
+        uses: ./.github/workflows/slack-notify.yml
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
+        with:
+          status: ${{ needs.build.result }}
