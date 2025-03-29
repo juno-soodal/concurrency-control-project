@@ -58,7 +58,7 @@ jobs:
           else
             aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageDigest=latest
             echo "Deleted image with digest: $IMAGE_DIGEST"
-          fi
+          fi 
 
       - name: Docker 이미지 생성
         run: |
