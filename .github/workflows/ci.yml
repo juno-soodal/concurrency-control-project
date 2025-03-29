@@ -23,10 +23,9 @@ jobs:
       - name: yml 파일 만들기
         run: |
           mkdir -p src/main/resources/
-          mkdir -p src/test/resources/
           echo "$APPLICATION_YML" > src/main/resources/application.yml
           echo "$APPLICATION_JWT" > src/main/resources/application-jwt.yml
-          echo "$APPLICATION_TEST" > src/test/resources/application-test.yml
+          echo "$APPLICATION_TEST" > src/main/resources/application-test.yml
         env:
           SPRING_PROFILES_ACTIVE: test
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
