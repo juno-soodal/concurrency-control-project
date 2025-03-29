@@ -14,15 +14,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.example.concurrencycontrolproject.config.QueryDslConfig;
 import com.example.concurrencycontrolproject.domain.concert.entity.Concert;
 import com.example.concurrencycontrolproject.domain.concert.entity.ConcertStatus;
+import com.example.concurrencycontrolproject.global.config.QueryDslConfig;
 
 @DataJpaTest
-// @SpringBootTest
-// @Transactional
-// @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-// @ImportAutoConfiguration(exclude = RedisAutoConfiguration.class)
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
 class ConcertSearchRepositoryImplTest {

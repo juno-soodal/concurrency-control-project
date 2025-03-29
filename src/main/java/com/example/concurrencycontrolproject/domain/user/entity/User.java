@@ -18,7 +18,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "users")
+@Table(name = "user")
 public class User extends TimeStamped {
 
 	@Id

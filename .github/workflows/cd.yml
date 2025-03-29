@@ -10,7 +10,6 @@ env:
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: 현재 레포지토리의 코드를 체크아웃해서 Actions에 가져온다
@@ -50,6 +49,22 @@ jobs:
       - name: ecr에 로그인
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 기존 ECR에 업로드된 latest 태그 이미지 삭제
+        run: |
+          IMAGE_DIGEST=$(aws ecr describe-images \
+            --repository-name $ECR_REPOSITORY \
+            --query "imageDetails[?contains(imageTags, \`$IMAGE_TAG\`)].imageDigest" \
+            --output text)
+
+          if [ -n "$IMAGE_DIGEST" ]; then
+            aws ecr batch-delete-image \
+              --repository-name $ECR_REPOSITORY \
+              --image-ids imageDigest=$IMAGE_DIGEST
+            echo "Deleted image with digest: $IMAGE_DIGEST"
+          else
+            echo "No image with tag '$IMAGE_TAG' found in ECR."
+          fi
 
       - name: Docker 이미지 생성
         run: |
