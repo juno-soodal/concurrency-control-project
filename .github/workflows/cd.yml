@@ -25,7 +25,7 @@ jobs:
           mkdir -p src/main/resources/
           mkdir -p src/test/resources/
           echo "$APPLICATION_YML" > src/main/resources/application.yml
-          echo "$APPLICATION_PROD" > src/main/resources/application_PROD.yml
+          echo "$APPLICATION_PROD" > src/main/resources/application_prod.yml
           echo "$APPLICATION_JWT" > src/main/resources/application-jwt.yml
         env:
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
