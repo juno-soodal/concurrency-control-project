@@ -52,17 +52,11 @@ jobs:
 
       - name: 기존 ECR에 업로드된 latest 태그 이미지 삭제
         run: |
-          IMAGE_DIGEST=$(aws ecr describe-images \
-            --repository-name "$ECR_REPOSITORY" \
-            --query "imageDetails[?contains(not_null(imageTags, []), 'latest')].imageDigest" \
-            --output text)
-      
+          IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPOSITORY | jq '.imageDetails[].imageTags[0]')
           if [[ -z "$IMAGE_DIGEST" ]]; then
-            echo "No image with tag 'latest' found in ECR."
+            echo "No images found in the repository."
           else
-            aws ecr batch-delete-image \
-              --repository-name "$ECR_REPOSITORY" \
-              --image-ids imageDigest="$IMAGE_DIGEST"
+            aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageTag=$IMAGE_DIGEST
             echo "Deleted image with digest: $IMAGE_DIGEST"
           fi
 
