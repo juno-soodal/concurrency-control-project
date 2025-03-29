@@ -56,7 +56,7 @@ jobs:
           if [[ -z "$IMAGE_DIGEST" ]]; then
             echo "No images found in the repository."
           else
-            aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageTag=$IMAGE_DIGEST
+            aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids imageDigest=latest
             echo "Deleted image with digest: $IMAGE_DIGEST"
           fi
 
