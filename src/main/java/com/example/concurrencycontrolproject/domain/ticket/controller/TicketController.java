@@ -1,7 +1,5 @@
 package com.example.concurrencycontrolproject.domain.ticket.controller;
 
-import static org.springframework.data.domain.Sort.Direction.*;
-
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Pageable;
@@ -36,13 +34,14 @@ public class TicketController {
 	private final TicketService ticketService;
 
 	// 티켓 생성
-	@PostMapping("/v1/schedule-seats/{scheduleSeatId}/tickets")
+	@PostMapping("/v1/schedules/{scheduleId}/{seatId}/tickets")
 	public Response<TicketResponse> saveTicket(
 		@AuthenticationPrincipal AuthUser authUser,
-		@PathVariable Long scheduleSeatId
+		@PathVariable Long scheduleId,
+		@PathVariable Long seatId
 	) {
 
-		return Response.of(ticketService.saveTicket(authUser, scheduleSeatId));
+		return Response.of(ticketService.saveTicket(authUser, scheduleId, seatId));
 	}
 
 	// 티켓 단건 조회
@@ -58,7 +57,7 @@ public class TicketController {
 	@GetMapping("/v1/tickets")
 	public Response<TicketResponse> getTickets(
 		@AuthenticationPrincipal AuthUser authUser,
-		@PageableDefault(page = 1, size = 10, sort = "createdAt", direction = DESC) Pageable pageable,
+		@PageableDefault(page = 1, size = 10) Pageable pageable,
 		@RequestParam(required = false) Long scheduleId,
 		@RequestParam(required = false) String ticketStatus,
 		@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime startedAt,

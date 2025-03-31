@@ -1,5 +1,7 @@
 package com.example.concurrencycontrolproject.domain.schedule.entity;
 
+import static lombok.AccessLevel.*;
+
 import java.time.LocalDateTime;
 
 import com.example.concurrencycontrolproject.domain.common.entity.TimeStamped;
@@ -21,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 @Table(name = "schedules")
 public class Schedule extends TimeStamped {
 
